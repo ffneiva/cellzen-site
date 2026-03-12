@@ -1,0 +1,67 @@
+name: Deploy CellZen → S3 + CloudFront
+
+on:
+  push:
+    branches:
+      - main
+
+  # Permite trigger manual pelo GitHub UI
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do código
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Configurar Node.js com cache de dependências
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Instalar dependências
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Build de produção
+      - name: Build
+        run: npm run build
+
+      # 5. Configurar credenciais AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ vars.AWS_REGION }}
+
+      # 6. Sincronizar build com o bucket S3
+      - name: Sync to S3
+        run: |
+          aws s3 sync dist/ s3://${{ vars.S3_BUCKET_NAME }} \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "index.html"
+
+          # index.html nunca deve ter cache longo (SPA entry point)
+          aws s3 cp dist/index.html s3://${{ vars.S3_BUCKET_NAME }}/index.html \
+            --cache-control "public, no-cache, must-revalidate"
+
+      # 7. Invalidar cache do CloudFront
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      # 8. Log do resultado
+      - name: ✅ Deploy concluído
+        run: |
+          echo "🚀 Deploy realizado com sucesso!"
+          echo "🌐 https://cellzen.fhio.com.br"
