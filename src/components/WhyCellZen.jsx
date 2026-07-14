@@ -1,183 +1,201 @@
-import { motion } from 'framer-motion';
-import { ShieldCheck, Tag, MapPin, Smartphone } from 'lucide-react';
-
-const STATS = [
-  { value: '100%', label: 'Foco em Android', color: '#1A7A82' },
-  { value: 'Grátis', label: 'Diagnóstico', color: '#C9A227' },
-  { value: '5★', label: 'Avaliação média', color: '#1A7A82' },
-];
+import { motion, useReducedMotion } from 'framer-motion';
+import {
+  SectionHeader,
+  Marginalia,
+  IconShield,
+  IconTag,
+  IconMapPin,
+  IconAndroid,
+  EASE_INK,
+  EASE_STAMP,
+  GOLD,
+  WASHI,
+} from './motifs';
 
 const FEATURES = [
   {
-    icon: ShieldCheck,
-    title: 'Qualidade Premium',
-    description: 'Peças selecionadas e reparos feitos com atenção a cada detalhe — sem atalhos.',
-    color: '#1A7A82',
+    kanji: '一',
+    icon: IconShield,
+    title: 'Qualidade sem atalhos',
+    description: 'Peças selecionadas e reparos feitos com atenção a cada detalhe. Testamos tudo antes de devolver.',
   },
   {
-    icon: Tag,
-    title: 'Preço Justo',
-    description: 'Orçamento transparente, sem surpresas. Premium não precisa custar caro.',
-    color: '#C9A227',
+    kanji: '二',
+    icon: IconTag,
+    title: 'Preço justo, orçamento transparente',
+    description: 'Você sabe o valor antes de qualquer serviço. Sem surpresas, sem letra miúda.',
   },
   {
-    icon: MapPin,
-    title: 'Buscamos em Goiânia',
-    description: 'Agendamos a coleta no local mais conveniente para você, em qualquer bairro.',
-    color: '#1A7A82',
+    kanji: '三',
+    icon: IconMapPin,
+    title: 'Coleta em qualquer bairro de Goiânia',
+    description: 'Agendamos a retirada e a devolução no local mais conveniente para você.',
   },
   {
-    icon: Smartphone,
-    title: 'Especialistas em Android',
-    description: '100% de foco em Android. Dominamos cada marca e modelo para um serviço mais preciso.',
-    color: '#C9A227',
+    kanji: '四',
+    icon: IconAndroid,
+    title: '100% Android, do sistema à placa',
+    description: 'Foco total em uma coisa só. Dominamos cada marca e modelo para um reparo mais preciso.',
   },
 ];
 
+const STATS = [
+  { value: '100%', label: 'ANDROID', note: '*', ring: '#1A7A82', valueColor: '#0F3A40' },
+  { value: '5', label: 'AVALIAÇÃO', note: '**', ring: '#C9A227', valueColor: '#0F3A40', pads: 5 },
+  { value: 'Grátis', label: 'DIAGNÓSTICO', note: '***', ring: '#B23A2A', valueColor: '#B23A2A' },
+];
+
+const FOOTNOTES = [
+  '* só Android. de verdade.',
+  '** média das avaliações dos clientes.',
+  '*** você só paga se consertar.',
+];
+
+/* Selo circular desenhado como hanko */
+function StampStat({ stat, index }) {
+  const reduced = useReducedMotion();
+  const finalRotate = index === 1 ? 1.5 : -2;
+  // prefers-reduced-motion: o carimbo aparece por opacity, sem scale/rotate
+  const stampAnim = reduced
+    ? {
+        initial: { opacity: 0, rotate: finalRotate },
+        whileInView: { opacity: 1 },
+        transition: { duration: 0.15, delay: 0.1 + index * 0.08 },
+      }
+    : {
+        initial: { scale: 1.2, opacity: 0, rotate: -6 },
+        whileInView: { scale: 1, opacity: 1, rotate: finalRotate },
+        transition: { duration: 0.18, delay: 0.15 + index * 0.12, ease: EASE_STAMP },
+      };
+  return (
+    <motion.div
+      className="flex flex-col items-center gap-3"
+      viewport={{ once: true, margin: '-60px' }}
+      {...stampAnim}
+    >
+      <div
+        className="relative flex flex-col items-center justify-center w-28 h-28 rounded-full"
+        style={{ border: `2.5px solid ${stat.ring}` }}
+      >
+        {/* Segundo anel irregular do carimbo */}
+        <span
+          className="absolute inset-[5px] rounded-full"
+          style={{ border: `1px solid ${stat.ring}`, opacity: 0.45 }}
+          aria-hidden="true"
+        />
+        <span
+          className="font-display font-bold"
+          style={{ fontSize: stat.value.length > 4 ? '1.375rem' : '1.75rem', color: stat.valueColor }}
+        >
+          {stat.value}
+        </span>
+        {/* Avaliação em pads de circuito, não em estrelas */}
+        {stat.pads && (
+          <span className="flex gap-1 mt-1.5" aria-hidden="true">
+            {Array.from({ length: stat.pads }).map((_, i) => (
+              <span key={i} className="relative inline-block w-[6px] h-[6px] rounded-full" style={{ backgroundColor: GOLD }}>
+                <span className="absolute inset-[1.5px] rounded-full" style={{ backgroundColor: WASHI }} />
+              </span>
+            ))}
+          </span>
+        )}
+      </div>
+      <span className="mono-label text-tinta-600">
+        {stat.label}
+        <span className="text-ouro-700 ml-0.5">{stat.note}</span>
+      </span>
+    </motion.div>
+  );
+}
+
 export default function WhyCellZen() {
   return (
-    <section
-      id="diferenciais"
-      className="py-24 md:py-32 relative overflow-hidden"
-      style={{ backgroundColor: '#070e18' }}
-    >
-      {/* Background accent */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(26,122,130,0.07) 0%, transparent 70%)',
-        }}
-      />
-
-      {/* Diagonal divider at top */}
-      <div
-        className="absolute top-0 left-0 right-0 h-1 pointer-events-none"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(26,122,130,0.3), rgba(201,162,39,0.2), transparent)' }}
-      />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Stats bar */}
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-wrap justify-center gap-8 mb-20 pt-2"
-        >
-          {STATS.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="text-center"
-            >
-              <div
-                className="font-outfit font-black leading-none mb-1"
-                style={{
-                  fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
-                  background: `linear-gradient(135deg, ${stat.color}, ${stat.color}99)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                {stat.value}
+    <section id="diferenciais" className="relative bg-washi-50 py-24 md:py-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-10">
+          {/* Título sticky à esquerda */}
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-32 flex gap-8">
+              <div className="flex-1">
+                <SectionHeader
+                  kanjiNum="三"
+                  num="03"
+                  kicker="Por que a CellZen"
+                  title="O reparo como ofício."
+                  sub="Mais do que consertar celulares — entregamos a tranquilidade de quem confia o aparelho a quem trata isso como arte."
+                />
+                {/* Traço vertical de pincel */}
+                <svg viewBox="0 0 10 160" className="w-2.5 h-36 mt-10 hidden lg:block" aria-hidden="true">
+                  <path
+                    fill="#1A7A82"
+                    opacity="0.8"
+                    d="M4.5 2 C 6.5 30, 7 60, 6 90 C 5.4 118, 4.4 140, 3.6 156 C 3.3 158, 5.8 158.4, 6.2 156.4 C 7.6 138, 8.6 114, 8.8 88 C 9 58, 8 28, 6.6 3 C 6.4 0.8, 4.6 0.4, 4.5 2 Z"
+                  />
+                </svg>
               </div>
-              <div className="font-inter text-xs uppercase tracking-widest" style={{ color: '#3a5060' }}>
-                {stat.label}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Main split */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-
-          {/* Left: heading */}
-          <motion.div
-            initial={{ opacity: 0, x: -32 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.6 }}
-            className="lg:sticky lg:top-28"
-          >
-            <span className="section-tag">Por que a CellZen?</span>
-            <h2
-              className="font-outfit font-black text-white leading-[0.92] mt-4 mb-6"
-              style={{ fontSize: 'clamp(2.8rem, 5.5vw, 4.5rem)' }}
-            >
-              O que nos{' '}
-              <span
-                style={{
-                  background: 'linear-gradient(135deg, #c9a227, #d4b85a)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                diferencia
-              </span>
-            </h2>
-            <p className="font-inter text-base leading-relaxed max-w-sm" style={{ color: '#4a6070' }}>
-              Mais do que consertar celulares — entregamos tranquilidade
-              e confiança em cada reparo.
-            </p>
-
-            {/* Decorative vertical line + dot */}
-            <div className="mt-10 flex items-center gap-4">
-              <div className="w-px h-16" style={{ background: 'linear-gradient(to bottom, rgba(26,122,130,0.6), transparent)' }} />
-              <span className="font-inter text-xs uppercase tracking-widest" style={{ color: '#2a4a52' }}>
-                Qualidade garantida
-              </span>
+              <Marginalia kanji="丁寧" romaji="teinei · esmero" className="pt-4" />
             </div>
-          </motion.div>
+          </div>
 
-          {/* Right: feature list */}
-          <div className="flex flex-col gap-5">
-            {FEATURES.map((feature, i) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, x: 32 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.5, delay: i * 0.08 }}
-                  className="group flex gap-5 p-6 rounded-2xl transition-all duration-300 cursor-default"
-                  style={{
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    backgroundColor: 'rgba(255,255,255,0.02)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = `${feature.color}35`;
-                    e.currentTarget.style.backgroundColor = `${feature.color}08`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)';
-                  }}
-                >
-                  <div
-                    className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-                    style={{
-                      background: `linear-gradient(135deg, ${feature.color}22, ${feature.color}0a)`,
-                      border: `1px solid ${feature.color}30`,
-                    }}
+          {/* Lista editorial — explicitamente NÃO são cards */}
+          <div className="lg:col-span-7">
+            <ul>
+              {FEATURES.map((feature, i) => {
+                const Icon = feature.icon;
+                return (
+                  <motion.li
+                    key={feature.title}
+                    className="group flex gap-5 sm:gap-7 items-start py-7 hairline-b first:hairline-t px-3 -mx-3 transition-colors duration-300 hover:bg-washi-200/70"
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ duration: 0.5, delay: i * 0.08, ease: EASE_INK }}
                   >
-                    <Icon size={22} style={{ color: feature.color }} />
-                  </div>
-                  <div>
-                    <h3 className="font-outfit font-bold text-white text-base mb-1">{feature.title}</h3>
-                    <p className="font-inter text-sm leading-relaxed" style={{ color: '#4a6070' }}>
-                      {feature.description}
-                    </p>
-                  </div>
-                </motion.div>
-              );
-            })}
+                    <span className="relative flex-shrink-0 pt-0.5" aria-hidden="true">
+                      <span className="absolute inset-[-4px] rounded-full bg-aguada opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <span
+                        className="relative font-display font-bold text-ouro-700"
+                        style={{ fontSize: '1.75rem', lineHeight: 1 }}
+                      >
+                        {feature.kanji}
+                      </span>
+                    </span>
+                    <span className="flex-1">
+                      <h3 className="font-display font-bold text-tinta-900 mb-1.5" style={{ fontSize: '1.25rem' }}>
+                        {feature.title}
+                      </h3>
+                      <p className="font-sans text-tinta-900/75 text-[0.9375rem] leading-relaxed max-w-[52ch]">
+                        {feature.description}
+                      </p>
+                    </span>
+                    <span className="hidden md:block flex-shrink-0 pt-1">
+                      <Icon size={38} />
+                    </span>
+                  </motion.li>
+                );
+              })}
+            </ul>
+
+            {/* Stats como carimbos */}
+            <div className="mt-14 flex flex-wrap items-start justify-center sm:justify-start gap-10 sm:gap-14">
+              {STATS.map((stat, i) => (
+                <StampStat key={stat.label} stat={stat} index={i} />
+              ))}
+            </div>
+
+            <motion.div
+              className="mt-8 space-y-1"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              {FOOTNOTES.map((note) => (
+                <p key={note} className="font-mono text-[0.6875rem] text-tinta-600/85 tracking-[0.06em]">
+                  {note}
+                </p>
+              ))}
+            </motion.div>
           </div>
         </div>
       </div>

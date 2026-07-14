@@ -13,10 +13,29 @@ Site institucional da **CellZen**, assistência técnica especializada em celula
 | Framework | [React 18](https://react.dev/) + [Vite 5](https://vitejs.dev/) |
 | Estilização | [Tailwind CSS 3](https://tailwindcss.com/) |
 | Animações | [Framer Motion 11](https://www.framer.com/motion/) |
-| Ícones | [Lucide React](https://lucide.dev/) |
-| Fontes | Outfit + Inter (Google Fonts) |
+| Ícones | SVGs autorais a traço + [Lucide React](https://lucide.dev/) (utilitários) |
+| Fontes | Zen Old Mincho + Zen Kaku Gothic New + IBM Plex Mono (Google Fonts) |
 | Deploy | AWS S3 + CloudFront |
 | CI/CD | GitHub Actions |
+
+---
+
+## 🎨 Direção de arte — "Sumi-ê sobre Washi"
+
+O design traduz o logo (um "Z" de pincelada sumi-ê atravessando um smartphone,
+com trilhas de circuito douradas) em um sistema de três matérias:
+
+- **Tinta (teal)** — o gesto humano: títulos, texto, pinceladas SVG, ensō;
+- **Ouro** — a máquina: trilhas de circuito 1–1.5px, pads, labels monoespaçadas;
+- **Shu (vermelho)** — o compromisso: carimbos hanko, usados com parcimônia.
+
+Canvas claro de papel washi (`#F8F4E9`) com textura de grão, tipografia
+mincho, espaço negativo generoso ("ma") e animações que seguem uma regra
+única: *a tinta seca em cena; o papel jamais se move*. Tokens de cor,
+curvas de easing (`ease-ink/paper/stamp`) e sombras estão em
+[`tailwind.config.js`](tailwind.config.js); os motivos reutilizáveis
+(pincelada, ensō, hanko, trilha, ícones a traço) em
+[`src/components/motifs.jsx`](src/components/motifs.jsx).
 
 ---
 
@@ -25,18 +44,23 @@ Site institucional da **CellZen**, assistência técnica especializada em celula
 ```
 src/
 ├── components/
-│   ├── Header.jsx          # Navegação + menu mobile animado
-│   ├── Hero.jsx            # Seção hero + marquee de marcas
-│   ├── Services.jsx        # Bento-grid de serviços
-│   ├── WhyCellZen.jsx      # Diferenciais (stats bar + split layout)
-│   ├── HowItWorks.jsx      # Como funciona (timeline vertical)
-│   ├── Testimonials.jsx    # Depoimentos de clientes
-│   ├── ContactCTA.jsx      # CTA + indicador de horário de atendimento
-│   └── Footer.jsx
+│   ├── motifs.jsx          # Biblioteca de motivos: pincelada, ensō, hanko,
+│   │                       #   pads, ícones autorais a traço, haiku
+│   ├── Header.jsx          # Nav fixa + drawer mobile "porta shoji"
+│   ├── Hero.jsx            # Ensō que se desenha + smartphone em desenho
+│   │                       #   técnico com rachadura kintsugi
+│   ├── Services.jsx        # 6 fichas de papel clicáveis (wa.me por serviço)
+│   ├── HowItWorks.jsx      # 3 passos + trilha circuito→pincelada (scroll)
+│   ├── WhyCellZen.jsx      # Lista editorial + stats como carimbos
+│   ├── QuickQuote.jsx      # Carta-orçamento ao vivo com selo de aprovação
+│   ├── Testimonials.jsx    # Pergaminhos kakejiku
+│   ├── ContactCTA.jsx      # CTA final + indicador aberto/fechado (noren)
+│   ├── Footer.jsx          # "Pedra de tinta" — único bloco escuro do site
+│   └── WhatsAppFloat.jsx   # Botão flutuante com anel "gota na água"
 ├── constants.js            # Dados do negócio (WhatsApp, endereço, etc.)
 ├── App.jsx
 ├── main.jsx
-└── index.css               # Tokens Tailwind + animações customizadas
+└── index.css               # Papel washi, grão, classes do sistema
 ```
 
 ---

@@ -32,3 +32,25 @@ export const BUSINESS = {
     'https://maps.google.com/maps?q=-16.708432,-49.291837&output=embed&hl=pt-BR&z=16',
   mapsLink: 'https://maps.app.goo.gl/WTNGoExKV4eUAt5e7',
 };
+
+/** Número de OS do dia — artefato documental da carta-orçamento */
+export const getOsNumber = () => {
+  const d = new Date();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `OS Nº ${d.getFullYear()}-${mm}${dd}-GYN`;
+};
+
+/** Aberto agora? Seg–Sáb, 08h–18h, horário de Brasília */
+export const isBusinessOpen = () => {
+  try {
+    const brt = new Date(
+      new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' })
+    );
+    const hour = brt.getHours();
+    const day = brt.getDay(); // 0=Dom, 1=Seg … 6=Sáb
+    return day >= 1 && day <= 6 && hour >= 8 && hour < 18;
+  } catch {
+    return false;
+  }
+};

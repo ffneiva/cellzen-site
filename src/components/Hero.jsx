@@ -1,251 +1,266 @@
-﻿import { motion } from 'framer-motion';
-import { MessageCircle, ArrowRight, Shield, Zap, Star } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { getWhatsAppUrl } from '../constants';
+import { BrushUnderline, Enso, Hanko, WhatsGlyph, EASE_INK, GOLD, WASHI } from './motifs';
 
-const BRANDS = ['Samsung', 'Motorola', 'Xiaomi', 'LG', 'Realme', 'OnePlus', 'Nokia', 'Asus'];
+const BRANDS = ['Samsung', 'Motorola', 'Xiaomi', 'Realme', 'LG', 'Asus', 'OnePlus'];
 
-function MarqueeBrands() {
-  // 4× so the loop is always filled on any screen size
-  const items = [...BRANDS, ...BRANDS, ...BRANDS, ...BRANDS];
+/* Smartphone em desenho técnico: contorno a traço, rachadura
+   kintsugi que deságua em trilhas de circuito, linhas de cota. */
+function PhoneDrawing() {
+  const reduced = useReducedMotion();
+  const ink = { fill: 'none', stroke: '#1A7A82', strokeWidth: 1.5 };
+  const gold = { fill: 'none', stroke: GOLD, strokeWidth: 1.25, strokeLinejoin: 'miter' };
   return (
-    <div className="overflow-hidden" style={{ maskImage: 'linear-gradient(90deg, transparent, black 15%, black 85%, transparent)' }}>
-      <div className="flex gap-5 animate-marquee whitespace-nowrap w-max">
-        {items.map((brand, i) => (
-          <span
-            key={i}
-            className="font-outfit font-bold text-sm tracking-widest uppercase px-4 py-2 rounded-full flex-shrink-0"
-            style={{ color: '#2a4a52', border: '1px solid rgba(26,122,130,0.15)' }}
-          >
-            {brand}
-          </span>
-        ))}
-      </div>
-    </div>
+    <svg viewBox="0 0 300 500" className="w-full h-full" aria-hidden="true">
+      {/* Cota vertical (JIS): linha + terminações oblíquas de 45° */}
+      <g stroke="#7A6014" strokeWidth="0.75" opacity="0.8">
+        <line x1="20" y1="24" x2="20" y2="464" />
+        <line x1="16" y1="28" x2="24" y2="20" />
+        <line x1="16" y1="468" x2="24" y2="460" />
+        <line x1="20" y1="24" x2="40" y2="24" strokeDasharray="2 3" />
+        <line x1="20" y1="464" x2="40" y2="464" strokeDasharray="2 3" />
+      </g>
+      <text
+        x="12"
+        y="244"
+        fontFamily="'IBM Plex Mono', monospace"
+        fontSize="9"
+        fill="#7A6014"
+        transform="rotate(-90 12 244)"
+        textAnchor="middle"
+        letterSpacing="1"
+      >
+        158.2 mm
+      </text>
+
+      {/* Corpo do aparelho */}
+      <motion.rect
+        x="44"
+        y="24"
+        width="196"
+        height="440"
+        rx="22"
+        {...ink}
+        initial={reduced ? false : { pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1.1, delay: 0.15, ease: EASE_INK }}
+      />
+      {/* Tela */}
+      <rect x="56" y="58" width="172" height="372" rx="6" {...ink} strokeWidth="0.9" opacity="0.55" />
+      {/* Alto-falante + câmera */}
+      <line x1="122" y1="41" x2="152" y2="41" {...ink} strokeWidth="1.2" />
+      <circle cx="166" cy="41" r="2.2" {...ink} strokeWidth="1.2" />
+
+      {/* Rachadura kintsugi: a fenda selada a ouro… */}
+      <motion.polyline
+        points="118,128 136,178 126,222 148,278"
+        {...gold}
+        strokeWidth="1.5"
+        initial={reduced ? false : { pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.7, delay: 1.0, ease: EASE_INK }}
+      />
+      <motion.polyline
+        points="136,178 158,196"
+        {...gold}
+        initial={reduced ? false : { pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.3, delay: 1.5, ease: EASE_INK }}
+      />
+
+      {/* …que se disciplina em trilhas de circuito */}
+      <motion.g
+        initial={reduced ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 1.7 }}
+      >
+        {/* Trilha 1: sai pela direita */}
+        <polyline points="148,278 186,278 202,294 262,294" {...gold} />
+        <circle cx="266" cy="294" r="4" fill={GOLD} />
+        <circle cx="266" cy="294" r="1.8" fill={WASHI} />
+        {/* Trilha 2: do galho, sobe e sai pela direita */}
+        <polyline points="158,196 190,196 206,180 262,180" {...gold} />
+        <circle cx="266" cy="180" r="4" fill={GOLD} />
+        <circle cx="266" cy="180" r="1.8" fill={WASHI} />
+        {/* Trilha 3: desce e mergulha na base */}
+        <polyline points="126,222 112,236 112,330 134,352 134,478" {...gold} />
+        <circle cx="134" cy="482" r="4" fill={GOLD} />
+        <circle cx="134" cy="482" r="1.8" fill={WASHI} />
+      </motion.g>
+    </svg>
   );
 }
 
 export default function Hero() {
+  const reduced = useReducedMotion();
+  const fadeUp = (delay) => ({
+    initial: reduced ? false : { opacity: 0, y: 14 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.55, delay, ease: EASE_INK },
+  });
+
   return (
-    <section
-      id="inicio"
-      className="relative min-h-screen flex flex-col overflow-hidden"
-      style={{ backgroundColor: '#050d14' }}
-    >
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-grid-subtle" />
+    <section id="inicio" className="relative flex flex-col bg-washi-50 overflow-hidden">
+      <div className="relative flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-28 lg:pt-36 pb-14">
+        {/* Marginália vertical na borda direita */}
+        <div
+          className="hidden xl:flex absolute right-2 top-40 flex-col items-center gap-3 select-none"
+          aria-hidden="true"
+        >
+          <span
+            className="vertical-rl font-display"
+            style={{ color: '#7A6014', fontSize: '0.8125rem', letterSpacing: '0.5em', whiteSpace: 'nowrap' }}
+          >
+            安心
+          </span>
+          <span className="w-px h-10 bg-ouro-700/35" />
+          <span
+            className="vertical-rl font-mono"
+            style={{ color: 'rgba(122,96,20,0.75)', fontSize: '0.5625rem', letterSpacing: '0.2em', whiteSpace: 'nowrap' }}
+          >
+            an-shin · tranquilidade
+          </span>
+        </div>
 
-      {/* Large teal circle behind logo */}
-      <div
-        className="absolute right-0 top-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle, rgba(26,122,130,0.12) 0%, rgba(26,122,130,0.04) 40%, transparent 70%)',
-          filter: 'blur(1px)',
-        }}
-      />
-
-      {/* Diagonal accent stripe */}
-      <div
-        className="absolute top-0 right-0 w-1/2 h-full pointer-events-none"
-        style={{
-          background: 'linear-gradient(135deg, transparent 60%, rgba(26,122,130,0.04) 100%)',
-          clipPath: 'polygon(30% 0, 100% 0, 100% 100%, 0% 100%)',
-        }}
-      />
-
-      {/* Gold accent line top-right */}
-      <div
-        className="absolute top-0 right-[15%] w-px h-48 pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, #c9a22700, #c9a227, #c9a22700)' }}
-      />
-
-      {/* Main content — split layout */}
-      <div className="relative z-10 flex-1 flex items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full py-16">
-
-          {/* Left: Text */}
-          <div className="order-2 lg:order-1">
-            {/* Tag */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <span className="section-tag">Goiânia — GO</span>
-            </motion.div>
-
-            {/* Headline — enormous, bold */}
-            <motion.h1
-              initial={{ opacity: 0, y: 32 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.25 }}
-              className="font-outfit font-black leading-[0.95] text-white mb-6"
-              style={{ fontSize: 'clamp(3.5rem, 7vw, 6rem)' }}
-            >
-              Seu celular
-              <br />
-              <span
-                style={{
-                  background: 'linear-gradient(135deg, #1a7a82 0%, #2dc4d0 60%, #c9a227 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                merece
-              </span>
-              <br />
-              o melhor.
-            </motion.h1>
-
-            {/* Sub */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="font-inter text-lg md:text-xl leading-relaxed mb-10 max-w-lg"
-              style={{ color: '#6a7e92' }}
-            >
-              Assistência técnica premium para celulares Android. Qualidade de alto padrão
-              com preço acessível — direto no seu WhatsApp.
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-6 items-center">
+          {/* Texto — colunas 1–6 */}
+          <div className="lg:col-span-6">
+            <motion.p className="mono-label text-ouro-700 mb-6" {...fadeUp(0.1)}>
+              Goiânia · GO — Assistência Android
             </motion.p>
 
-            {/* CTA Row */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.55 }}
-              className="flex flex-col sm:flex-row gap-4 mb-12"
+            <motion.h1
+              className="font-display font-bold text-tinta-900 mb-7"
+              style={{
+                fontSize: 'clamp(2.5rem, 7vw, 5rem)',
+                lineHeight: 1.12,
+                letterSpacing: '-0.015em',
+              }}
+              {...fadeUp(0.22)}
             >
+              A{' '}
+              <span className="relative inline-block">
+                arte
+                <BrushUnderline
+                  className="absolute left-[-4%] right-[-4%] bottom-[-0.12em] w-[108%] h-[0.22em]"
+                  delay={0.9}
+                />
+              </span>{' '}
+              de consertar o seu Android.
+            </motion.h1>
+
+            <motion.p
+              className="font-sans text-tinta-900/80 mb-4 max-w-[46ch]"
+              style={{ fontSize: '1.0625rem', lineHeight: 1.75 }}
+              {...fadeUp(0.38)}
+            >
+              Quebrou? A gente busca, conserta e devolve. Diagnóstico gratuito, coleta em
+              qualquer bairro de Goiânia e a calma de quem trata cada reparo como ofício.
+            </motion.p>
+
+            <motion.p className="font-mono text-[0.75rem] text-tinta-600 mb-10" {...fadeUp(0.46)}>
+              — Seu celular, nossa missão.
+            </motion.p>
+
+            <motion.div className="flex flex-col sm:flex-row sm:items-center gap-4" {...fadeUp(0.54)}>
               <a
                 href={getWhatsAppUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-whatsapp font-outfit text-lg px-8 py-4 rounded-2xl"
+                className="btn-ink text-base px-7 h-[52px]"
               >
-                <MessageCircle size={21} />
-                Orçamento Grátis
+                <WhatsGlyph size={18} color="#E6CE79" />
+                Pedir orçamento no WhatsApp
               </a>
-
               <a
                 href="#servicos"
-                className="inline-flex items-center justify-center gap-2 font-outfit font-bold text-lg px-8 py-4 rounded-2xl transition-all duration-200 group"
-                style={{ color: '#6a7e92', border: '1px solid rgba(255,255,255,0.07)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.borderColor = 'rgba(26,122,130,0.4)'; e.currentTarget.style.backgroundColor = 'rgba(26,122,130,0.06)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = '#6a7e92'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                className="group inline-flex items-center gap-2 font-sans font-medium text-tinta-700 hover:text-tinta-600 px-2 py-3 transition-colors duration-200"
               >
-                Ver Serviços
-                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-1" />
-              </a>
-            </motion.div>
-
-            {/* Trust badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="flex flex-wrap gap-5"
-            >
-              {[
-                { icon: Shield, label: 'Qualidade Premium' },
-                { icon: Zap, label: 'Atendimento Rápido' },
-                { icon: Star, label: 'Clientes Satisfeitos' },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2">
-                  <div
-                    className="w-7 h-7 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: 'rgba(26,122,130,0.15)', border: '1px solid rgba(26,122,130,0.25)' }}
+                <span className="relative">
+                  Ver serviços
+                  <span
+                    className="absolute left-0 right-0 -bottom-1 h-[3px] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-[240ms] ease-ink"
+                    aria-hidden="true"
                   >
-                    <Icon size={13} style={{ color: '#1A7A82' }} />
-                  </div>
-                  <span className="font-inter text-sm" style={{ color: '#4a5e6e' }}>{label}</span>
-                </div>
-              ))}
+                    <svg viewBox="0 0 240 20" className="w-full h-full" preserveAspectRatio="none">
+                      <path
+                        fill="#1A7A82"
+                        d="M4 8 C 60 4, 140 3, 236 7 C 237 7.4, 237 8.6, 235 9 C 150 13, 60 13, 5 11 C 3 10.6, 3 8.6, 4 8 Z"
+                      />
+                    </svg>
+                  </span>
+                </span>
+                <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
+              </a>
             </motion.div>
           </div>
 
-          {/* Right: Logo + floating elements */}
-          <div className="order-1 lg:order-2 flex items-center justify-center relative">
-            {/* Spinning outer ring */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="relative flex items-center justify-center w-60 h-60 sm:w-72 sm:h-72 md:w-96 md:h-96"
-            >
-              {/* Outer dashed ring — spinning */}
-              <div
-                className="absolute inset-0 rounded-full animate-spin-slow"
-                style={{
-                  border: '1px dashed rgba(26,122,130,0.25)',
-                }}
+          {/* Arte — colunas 7–12: ensō + smartphone a traço + hanko */}
+          <div className="lg:col-span-6 flex justify-center lg:justify-end lg:pr-8">
+            <div className="relative w-[17rem] sm:w-[19rem] lg:w-[21rem]">
+              {/* Ensō que se desenha ao redor */}
+              <Enso
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[160%] aspect-square"
+                draw
+                duration={1.4}
+                delay={0.3}
+                strokeWidth={5.5}
+                opacity={0.9}
               />
-
-              {/* Mid ring */}
-              <div
-                className="absolute rounded-full"
-                style={{
-                  inset: '16px',
-                  border: '1px solid rgba(26,122,130,0.12)',
-                }}
-              />
-
-              {/* Glow bg */}
-              <div
-                className="absolute rounded-full animate-glow-pulse"
-                style={{
-                  inset: '32px',
-                  background: 'radial-gradient(circle, rgba(26,122,130,0.2) 0%, transparent 70%)',
-                }}
-              />
-
-              {/* Logo */}
-              <motion.img
-                src="/assets/logo_transparent.png"
-                alt="CellZen"
-                className="relative z-10 w-36 h-36 sm:w-44 sm:h-44 md:w-56 md:h-56 animate-float"
-                style={{ filter: 'drop-shadow(0 0 40px rgba(26,122,130,0.5)) drop-shadow(0 0 80px rgba(26,122,130,0.2))' }}
-              />
-
-              {/* Floating chip — top-right */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.9, type: 'spring' }}
-                className="absolute -top-2 -right-4 px-3 py-2 rounded-xl font-outfit font-bold text-xs text-white hidden sm:flex items-center gap-1.5"
-                style={{ background: 'linear-gradient(135deg, #1a7a82, #0e5e66)', boxShadow: '0 4px 20px rgba(26,122,130,0.4)' }}
-              >
-                <Zap size={11} />
-                Especialistas
-              </motion.div>
-
-              {/* Floating chip — bottom-left */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 1.1, type: 'spring' }}
-                className="absolute -bottom-2 -left-6 px-3 py-2 rounded-xl font-outfit font-bold text-xs hidden sm:flex items-center gap-1.5"
-                style={{ background: 'rgba(201,162,39,0.12)', border: '1px solid rgba(201,162,39,0.3)', color: '#c9a227', boxShadow: '0 4px 20px rgba(201,162,39,0.15)' }}
-              >
-                <Star size={11} fill="#c9a227" />
-                Android
-              </motion.div>
-            </motion.div>
+              <div className="relative aspect-[300/500]">
+                <PhoneDrawing />
+              </div>
+              {/* O selo que carimba quando o traço termina */}
+              <div className="absolute -bottom-3 -right-2">
+                {/* Respingo radial do carimbo */}
+                {!reduced && (
+                  <motion.svg
+                    viewBox="0 0 80 80"
+                    className="absolute -inset-4 w-[calc(100%+2rem)] h-[calc(100%+2rem)] pointer-events-none"
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: [0, 1, 0], scale: [0.6, 1.15, 1.25] }}
+                    transition={{ duration: 0.24, delay: 1.93, times: [0, 0.4, 1] }}
+                    aria-hidden="true"
+                  >
+                    {[15, 60, 105, 150, 195, 240, 285, 330].map((deg) => (
+                      <circle
+                        key={deg}
+                        cx={40 + 34 * Math.cos((deg * Math.PI) / 180)}
+                        cy={40 + 34 * Math.sin((deg * Math.PI) / 180)}
+                        r={deg % 90 === 15 ? 1.6 : 1.1}
+                        fill="#B23A2A"
+                      />
+                    ))}
+                  </motion.svg>
+                )}
+                <Hanko variant="square" char="禅" size={46} stamp delay={1.75} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Brands marquee bar */}
+      {/* Marcas atendidas — linha tipográfica estática */}
       <motion.div
-        initial={{ opacity: 0 }}
+        className="relative hairline-t py-5"
+        initial={reduced ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1 }}
-        className="relative z-10 py-6"
-        style={{ borderTop: '1px solid rgba(26,122,130,0.1)' }}
+        transition={{ duration: 0.6, delay: 1.2 }}
       >
-        <p className="font-inter text-xs text-center uppercase tracking-widest mb-4" style={{ color: '#2a3a4a' }}>
-          Marcas que atendemos
-        </p>
-        <MarqueeBrands />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <span className="mono-label text-tinta-600 mr-2">Marcas que atendemos</span>
+          {BRANDS.map((brand, i) => (
+            <span key={brand} className="flex items-center gap-4">
+              <span className="font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-tinta-600">
+                {brand}
+              </span>
+              {i < BRANDS.length - 1 && (
+                <span className="inline-block w-[3px] h-[3px] rounded-full bg-ouro-500" aria-hidden="true" />
+              )}
+            </span>
+          ))}
+        </div>
       </motion.div>
     </section>
   );
